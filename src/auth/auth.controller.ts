@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, UpdateUserDto } from './dto/create-user.dto';
 import { LocalServiceStrategy } from './guards/local-service.guard';
 import { JwtServiceAuthGuard } from './guards/jwt-service.guard';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -76,7 +76,7 @@ export class AuthController {
     @ApiOperation({summary: 'profile', description: 'get my profile'})
     @UseGuards(JwtServiceAuthGuard)
     @Post('changeProfile')
-    async changeProfile(@Body() userDto: CreateUserDto,@Req() req, @Res() res) {
+    async changeProfile(@Body() userDto: UpdateUserDto,@Req() req, @Res() res) {
         let user = await this.authService.findJwtUser(req);
         await this.authService.saveUserData(req, user);
         res.status(200).json({
