@@ -62,7 +62,7 @@ export class AuthController {
     
     @ApiOperation({summary: 'profile', description: 'get my profile'})
     @UseGuards(JwtServiceAuthGuard)
-    @Post('profile')
+    @Get('profile')
     async getProfile(@Req() req) {
         let user = await this.authService.findJwtUser(req);
         return {
@@ -86,7 +86,7 @@ export class AuthController {
     }
 
     @ApiOperation({summary: 'refresh token', description: 'generate another refreshToken'})
-    @Post('refresh')
+    @Post('refreshToken')
     async refresh(
         @Req() req: Request,
         @Res({ passthrough: true }) res//: Response,
