@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/entities/user.entity';
+import { Users } from 'src/entities/users.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -13,8 +13,8 @@ const bcrypt = require('bcrypt');
 @Injectable()
 export class AuthService {
     constructor(
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
+        @InjectRepository(Users)
+        private readonly userRepository: Repository<Users>,
         private readonly configService: ConfigService,
         private jwtService: JwtService,
     ) {}
@@ -56,7 +56,7 @@ export class AuthService {
         }
         return user;
     }
-    async loginServiceUser(user: User) {
+    async loginServiceUser(user: Users) {
         const payload = {
             id: user.user_id,
             nickname: user.nickname
@@ -66,7 +66,7 @@ export class AuthService {
             token: this.jwtService.signAsync(payload),
         }
     }
-    async generateRefreshToken(user: User) {
+    async generateRefreshToken(user: Users) {
         const payload = {
             id: user.user_id,
         }
@@ -111,11 +111,11 @@ export class AuthService {
         return await this.userRepository.findOne({where:{user_id: decodeToken.user_id}});
     }
 
-    async deleteUser(user: User){
+    async deleteUser(user: Users){
         await this.userRepository.delete({user_id: user.user_id});
     }
 
-    async saveUserData(req: Request, user: User){
+    async saveUserData(req: Request, user: Users){
         let userData = await this.findJwtUser(req);
         userData.nickname = user.nickname;
         userData.is_man = user.is_man;

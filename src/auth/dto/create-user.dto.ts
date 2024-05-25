@@ -1,5 +1,5 @@
 import { PickType } from "@nestjs/swagger";
-import { User } from "src/entities/user.entity";
+import { Users } from "src/entities/users.entity";
 
 export class CreateUserDto {
     user_id: string;
@@ -9,8 +9,7 @@ export class CreateUserDto {
     password: string;
 }
 
-export class 
-LoginUserDto extends PickType(User, ['user_id', 'password']) {}
+export class LoginUserDto extends PickType(Users, ['user_id', 'password']) {}
 
 export class UpdateUserDto {
     nickname: string;
