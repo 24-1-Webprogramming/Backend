@@ -15,10 +15,7 @@ import { GoogleStrategy } from './strategies/google.strategy';
   imports: [
     TypeOrmModule.forFeature([Users]),
     PassportModule.register({ session: false }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env.dev',
-    }),
+    ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {

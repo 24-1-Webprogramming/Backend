@@ -9,19 +9,24 @@ import { Onboard_conditions } from './entities/onboard_conditions.entity';
 import { OnboardModule } from './onboard/onboard.module';
 import { DietModule } from './diet/diet.module';
 import { User_diets } from './entities/user_diets.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env.dev',
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: "3.38.212.126",
-      port: 3306,
-      username: 'health_dev',
-      password: 'health2024!@',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
       database: 'health',
       entities: [Users, Onboard_conditions, User_diets],
-      //synchronize: false,
-      //logging: true,
+      synchronize: false,
+      logging: false,
     }),
     AuthModule,
     OnboardModule,

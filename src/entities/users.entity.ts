@@ -10,25 +10,29 @@ export class Users {
   @Column({
     type: 'varchar',
     unique: true,
-    length: 20
+    length: 20,
+    nullable: true
   })
-  nickname: string;
+  nickname: string | null;
 
   @Column({
     type: 'boolean',
-    unique: true
+    unique: true,
+    nullable: true
   })
-  is_man: boolean;
+  is_man: boolean | null;
 
   @Column({
-    type: 'date'
+    type: 'date',
+    nullable: true
   })
-  d_day: Date;
+  d_day: Date | null;
 
   @Column({
     type: 'varchar',
-    length: 255
+    length: 255,
+    nullable: true
   })
-  password: string;
+  password: string | null;
 }
 
