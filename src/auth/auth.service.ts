@@ -47,7 +47,7 @@ export class AuthService {
     }
 
     async validateServiceUser(id: string, password: string): Promise<any> {
-        const user = await this.userRepository.findOne({where:{user_id: id}})
+        const user = await this.userRepository.findOne({where:{user_id: id}});
         if (!user) {
             throw new ForbiddenException(`there's no user with id ${id}`);
         }
@@ -73,9 +73,7 @@ export class AuthService {
         return this.jwtService.signAsync({id: payload.id}, {
             secret: this.configService.get('SECRET_KEY'),
             expiresIn: '2w',
-        }
-
-        )
+        });
     }
 
     async refresh(refreshTokenDto: RefreshTokenDto): Promise<{ acessToken: string }> {
@@ -112,7 +110,7 @@ export class AuthService {
     }
 
     async deleteUser(user: Users){
-        await this.userRepository.delete({user_id: user.user_id});
+        let ans = await this.userRepository.delete({user_id: user.user_id});
     }
 
     async saveUserData(req: Request, user: Users){

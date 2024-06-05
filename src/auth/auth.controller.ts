@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiForbiddenResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { CreateUserDto, UpdateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto/create-user.dto';
 import { LocalServiceStrategy } from './guards/local-service.guard';
 import { JwtServiceAuthGuard } from './guards/jwt-service.guard';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -14,38 +14,45 @@ export class AuthController {
         private authService: AuthService
     ) {}
 
-    @ApiOperation({summary: 'resigst', description: 'make account'})
-    @ApiBody({type: CreateUserDto})
+    
     @Post('join')
-    async postJoin(@Body() createUserDto: CreateUserDto) {
+    @ApiOperation({summary: '회원가입 api', description: 'User 정보를 생성한다. '})
+    @ApiBody({type: CreateUserDto})
+    @ApiResponse({ status: 201, description: 'The User record has been successfully created.'})
+    async postJoin(@Body() createUserDto: CreateUserDto, @Res() res) {
         await this.authService.checkPassword(createUserDto);
         createUserDto = await this.authService.hashing(createUserDto);
-        return await this.authService.postJoin(createUserDto);
+        let user = await this.authService.postJoin(createUserDto);
+        return res.status(HttpStatus.CREATED).json(user);
     }
-
-    @ApiOperation({summary: 'login', description: 'login'})
+    
     @UseGuards(LocalServiceStrategy)
     @Post('login')
+    @ApiOperation({summary: '로그인', description: 'User 정보를 대조해 토큰을 발급한다'})
+    @ApiBody({type: LoginUserDto})
     async postLogin(@Req() req, @Res() res) {
         const token = await this.authService.loginServiceUser(req.user);
-        res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        res.setHeader('Authorization', 'Bearer ' + await token.token);
+        //res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        //res.setHeader('Authorization', 'Bearer ' + await token.token);
 
-        const refreshToken = this.authService.generateRefreshToken(req.user);
-        res.setHeader('Refresh', 'Bearer ' + await refreshToken);
-        res.status(200).json({
-            status: 200,
+        const refreshToken = await this.authService.generateRefreshToken(req.user);
+        //res.setHeader('Refresh', 'Bearer ' + await refreshToken);
+        res.status(HttpStatus.OK).json({
             info: "success",
-            token: await token.token
+            token: await token.token,
+            refreshToken: await refreshToken
         });
     }
 
+    @ApiOperation({summary: '구글 로그인', description: '구글 계정에서 고유 식별 번호를 요청받는다 이후 google/callback으로 리다이렉트 한다'})
+    @ApiBody({type: LoginUserDto})
     @Get('googleLogin')
     @UseGuards(GoogleGuard)
     async googleAuthCallback(@Req() req, @Res() res){
-        return res.status(200).send();
+        return res.status(HttpStatus.OK).send();
     }
 
+    @ApiOperation({summary: '구글 로그인 리다이렉트', description: '(이쪽으로 직접 요청하지 마세요) 회원 정보가 있을 경우 로그인, 없을 경우 회원가입 후 로그인 한다. '})
     @Get('google/callback')
     @UseGuards(GoogleGuard)
     async googleAuth(@Req() req, @Res() res): Promise<void> {
@@ -56,8 +63,8 @@ export class AuthController {
         const token = await this.authService.googleLogin(req, res);
         console.log("token is ")
         console.log(token)
-        res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        res.setHeader('Authorization', 'Bearer ' + token.token);
+        //res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        //res.setHeader('Authorization', 'Bearer ' + token.token);
 
         res.status(200).json({
             status: 200,
@@ -66,7 +73,8 @@ export class AuthController {
         });
     }
     
-    @ApiOperation({summary: 'profile', description: 'get my profile'})
+    @ApiBearerAuth()
+    @ApiOperation({summary: '프로필', description: 'get my profile'})
     @UseGuards(JwtServiceAuthGuard)
     @Get('profile')
     async getProfile(@Req() req) {
@@ -79,19 +87,21 @@ export class AuthController {
         }
     }
 
-    @ApiOperation({summary: 'profile', description: 'get my profile'})
+    @ApiBearerAuth()
+    @ApiOperation({summary: '프로필 수정', description: '프로필 정보, User record의 정보를 수정한다'})
     @UseGuards(JwtServiceAuthGuard)
     @Post('changeProfile')
     async changeProfile(@Body() userDto: UpdateUserDto,@Req() req, @Res() res) {
         let user = await this.authService.findJwtUser(req);
         await this.authService.saveUserData(req, user);
-        res.status(200).json({
+        res.status(HttpStatus.OK).json({
             status: 200,
             info: "success"
         });
     }
 
-    @ApiOperation({summary: 'refresh token', description: 'generate another refreshToken'})
+    @ApiBearerAuth()
+    @ApiOperation({summary: '신규 토큰 발급', description: 'refresh token을 bearer헤더로 두면 새로운 jwt token을 발급한다'})
     @Post('refreshToken')
     async refresh(
         @Req() req: Request,
@@ -101,22 +111,23 @@ export class AuthController {
         let refreshTokenDto: RefreshTokenDto = {refresh_token: token};
 
         const newAccessToken = (await this.authService.refresh(refreshTokenDto)).acessToken;
-        res.setHeader('Authorization', 'Bearer ' + newAccessToken);
-        res.cookie('access_token', newAccessToken, { httpOnly: true });
+        //res.setHeader('Authorization', 'Bearer ' + newAccessToken);
+        //res.cookie('access_token', newAccessToken, { httpOnly: true });
         res.send({newAccessToken});
+        res.status(HttpStatus.OK);
     }
 
-    @ApiOperation({summary: 'profile', description: 'get my profile'})
+    @ApiBearerAuth()
+    @ApiOperation({summary: 'secession', description: 'delete user record'})
     @UseGuards(JwtServiceAuthGuard)
     @Delete('secession')
     async secession(@Req() req: Request,@Res() res){
         let user = await this.authService.findJwtUser(req);
         await this.authService.deleteUser(user);
 
-        res.status(200).json({
-            status: 200,
-            info: "success",
-            deletedUser: user,
+        res.status(HttpStatus.OK).json({
+            info: "deleted",
+            deletedUSer: user
         });
-    }
+    }   
 }
