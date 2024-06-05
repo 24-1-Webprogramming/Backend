@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class FindDietDto {
+export class SearchGymDto {
     @ApiProperty()
-    log_date: Date;
+    address: string
 }

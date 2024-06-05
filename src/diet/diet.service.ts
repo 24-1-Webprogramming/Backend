@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User_diets } from 'src/entities/user_diets.entity';
 import { Repository } from 'typeorm';
 import { dietDto } from './dto/diet.dto';
+import { DeleteDieWithIdtDto, DeleteDieWithTypeDto } from './dto/delete-diet.dto';
 
 @Injectable()
 export class DietService {
@@ -34,10 +35,17 @@ export class DietService {
         const decodedToken = this.jwtService.verify(token, {secret: this.configService.get('SECRET_KEY')});
         return decodedToken.id;
     }
-    /*
-    async deleteData(data: dietDto){
-        return await this.user_dietRepository.delete({})
+    async deleteDietWithId(id: number){
+        return await this.user_dietRepository.delete({diet_id: id})
     }
-    */
+
+    async deleteDietWithType(data: DeleteDieWithTypeDto, req: Request){
+        let user = await this.getUserId(req);
+        let diet = await this.user_dietRepository.findOne({where: {user_id: user, diet_type: data.diet_type, log_date: data.log_date}})
+        console.log(diet)
+        if (diet == null) { return null }
+        return await this.deleteDietWithId(diet.diet_id);
+    }
+    
 
 }
