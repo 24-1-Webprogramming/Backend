@@ -67,14 +67,14 @@ export class AuthController {
     @Get('google/callback')
     @UseGuards(GoogleGuard)
     async googleAuth(@Req() req, @Res() res): Promise<void> {
-        const data = await this.authService.googleLogin(req, res);
+        const data = await this.authService.googleLogin(req);
         //res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        res.setHeader('Authorization', 'Bearer ' + data.token);
+        //res.setHeader('Authorization', 'Bearer ' + data.token.token);
         
         res.status(HttpStatus.OK).json({
             info: "success",
-            token: await data.token,
-            refreshToken: await data.refresh
+            token: data.token.token,
+            refreshToken: data.refresh
         });
     }
     
