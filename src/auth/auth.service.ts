@@ -90,7 +90,7 @@ export class AuthService {
         return {acessToken: accessToken};
     }
 
-    async googleLogin(req, res){
+    async googleLogin(req){
         let user = await this.userRepository.findOne({where: {'user_id': await req.user.providerId}});
         if (!user) {
             const input = {
