@@ -60,7 +60,6 @@ export class AuthService {
         const payload = {
             type: 'access',
             id: user.user_id,
-            nickname: user.nickname
         }
 
         return {
@@ -103,7 +102,7 @@ export class AuthService {
             user = await this.postJoin(input);
         }
         let data = {
-            token: await this.loginServiceUser(user),
+            token: await (await this.loginServiceUser(user)).token,
             refresh: await this.generateRefreshToken(user)
         }
         return data;

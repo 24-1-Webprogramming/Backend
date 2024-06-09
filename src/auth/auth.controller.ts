@@ -69,11 +69,11 @@ export class AuthController {
     async googleAuth(@Req() req, @Res() res): Promise<void> {
         const data = await this.authService.googleLogin(req);
         //res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        //res.setHeader('Authorization', 'Bearer ' + data.token.token);
+        //res.setHeader('Authorization', 'Bearer ' + data.token);
         
         res.status(HttpStatus.OK).json({
             info: "success",
-            token: data.token.token,
+            token: data.token,
             refreshToken: data.refresh
         });
     }
