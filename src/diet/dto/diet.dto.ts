@@ -56,4 +56,3 @@ export class createDietDto {
     @ApiProperty()
     log_date: Date;
 }
-

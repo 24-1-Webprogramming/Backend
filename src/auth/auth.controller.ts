@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiForbiddenResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, LoginUserDto, UpdateUserDto, UserDto, acessTokenDto, tokensDto } from './dto/user.dto';
 import { LocalServiceStrategy } from './guards/local-service.guard';
 import { JwtServiceAuthGuard } from './guards/jwt-service.guard';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -18,18 +18,27 @@ export class AuthController {
     @Post('join')
     @ApiOperation({summary: '회원가입 api', description: 'User 정보를 생성한다. '})
     @ApiBody({type: CreateUserDto})
-    @ApiResponse({ status: 201, description: 'The User record has been successfully created.'})
+    @ApiResponse({ 
+        status: 201, 
+        description: 'The User record has been successfully created.',
+        type: UserDto
+    })
     async postJoin(@Body() createUserDto: CreateUserDto, @Res() res) {
         await this.authService.checkPassword(createUserDto);
         createUserDto = await this.authService.hashing(createUserDto);
         let user = await this.authService.postJoin(createUserDto);
         return res.status(HttpStatus.CREATED).json(user);
     }
-    
+
     @UseGuards(LocalServiceStrategy)
     @Post('login')
     @ApiOperation({summary: '로그인', description: 'User 정보를 대조해 토큰을 발급한다'})
     @ApiBody({type: LoginUserDto})
+    @ApiResponse({ 
+        status: 201, 
+        description: 'success',
+        type: tokensDto
+    })
     async postLogin(@Req() req, @Res() res) {
         const token = await this.authService.loginServiceUser(req.user);
         //res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -45,7 +54,9 @@ export class AuthController {
     }
 
     @ApiOperation({summary: '구글 로그인', description: '구글 계정에서 고유 식별 번호를 요청받는다 이후 google/callback으로 리다이렉트 한다'})
-    @ApiBody({type: LoginUserDto})
+    @ApiResponse({
+        type: tokensDto
+    })
     @Get('googleLogin')
     @UseGuards(GoogleGuard)
     async googleAuthCallback(@Req() req, @Res() res){
@@ -61,11 +72,11 @@ export class AuthController {
         console.log("res is ");
         console.log(res);
         const token = await this.authService.googleLogin(req, res);
-        console.log("token is ")
+        console.log("token is ");
         console.log(token)
-        //res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        //res.setHeader('Authorization', 'Bearer ' + token.token);
-
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.setHeader('Authorization', 'Bearer ' + token.token);
+        
         res.status(200).json({
             status: 200,
             info: "success",
@@ -75,33 +86,45 @@ export class AuthController {
     
     @ApiBearerAuth()
     @ApiOperation({summary: '프로필', description: 'get my profile'})
+    @ApiResponse({ 
+        status: 302, 
+        description: '사용자의 프로필을 반환',
+        type: UserDto
+    })
     @UseGuards(JwtServiceAuthGuard)
     @Get('profile')
-    async getProfile(@Req() req) {
+    async getProfile(@Req() req, @Res() res) {
         let user = await this.authService.findJwtUser(req);
-        return {
+        res.status(HttpStatus.FOUND).json({
             user_id: user.user_id,
             nickname: user.nickname,
             is_man: user.is_man,
             d_day: user.d_day,
-        }
+        });
     }
 
     @ApiBearerAuth()
     @ApiOperation({summary: '프로필 수정', description: '프로필 정보, User record의 정보를 수정한다'})
     @UseGuards(JwtServiceAuthGuard)
+    @ApiResponse({ 
+        status: 200, 
+        description: 'success',
+        type: tokensDto
+    })
     @Post('changeProfile')
     async changeProfile(@Body() userDto: UpdateUserDto,@Req() req, @Res() res) {
         let user = await this.authService.findJwtUser(req);
-        await this.authService.saveUserData(req, user);
-        res.status(HttpStatus.OK).json({
-            status: 200,
-            info: "success"
-        });
+        let ans = await this.authService.saveUserData(req, user);
+        res.status(HttpStatus.OK).json(ans);
     }
 
     @ApiBearerAuth()
-    @ApiOperation({summary: '신규 토큰 발급', description: 'refresh token을 bearer헤더로 두면 새로운 jwt token을 발급한다'})
+    @ApiOperation({summary: '토큰 refresh', description: 'refresh token을 bearer헤더로 두면 새로운 jwt token을 발급한다'})
+    @ApiResponse({ 
+        status: 200, 
+        description: 'success',
+        type: acessTokenDto
+    })
     @Post('refreshToken')
     async refresh(
         @Req() req: Request,
@@ -120,14 +143,16 @@ export class AuthController {
     @ApiBearerAuth()
     @ApiOperation({summary: 'secession', description: 'delete user record'})
     @UseGuards(JwtServiceAuthGuard)
+    @ApiResponse({ 
+        status: 200, 
+        description: 'success',
+        type: UserDto
+    })
     @Delete('secession')
     async secession(@Req() req: Request,@Res() res){
         let user = await this.authService.findJwtUser(req);
         await this.authService.deleteUser(user);
 
-        res.status(HttpStatus.OK).json({
-            info: "deleted",
-            deletedUSer: user
-        });
+        res.status(HttpStatus.OK).json(user);
     }   
 }

@@ -8,10 +8,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtServiceStrategy } from 'src/auth/strategies/jwt-service.strategy';
 import { Users } from 'src/entities/users.entity';
+import { Stat } from 'src/entities/user_stats.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Users, Group, GroupMember]),
+    TypeOrmModule.forFeature([Users, Group, GroupMember, Stat]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {

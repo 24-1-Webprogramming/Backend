@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/c
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/entities/users.entity';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -58,6 +58,7 @@ export class AuthService {
     }
     async loginServiceUser(user: Users) {
         const payload = {
+            type: 'access',
             id: user.user_id,
             nickname: user.nickname
         }
@@ -68,9 +69,10 @@ export class AuthService {
     }
     async generateRefreshToken(user: Users) {
         const payload = {
+            type: 'refresh',
             id: user.user_id,
         }
-        return this.jwtService.signAsync({id: payload.id}, {
+        return this.jwtService.signAsync(payload, {
             secret: this.configService.get('SECRET_KEY'),
             expiresIn: '2w',
         });
@@ -100,6 +102,7 @@ export class AuthService {
             } as CreateUserDto;
             user = await this.postJoin(input);
         }
+        console.log(user);
         return await this.loginServiceUser(user);
     }
 
@@ -118,6 +121,6 @@ export class AuthService {
         userData.nickname = user.nickname;
         userData.is_man = user.is_man;
         userData.d_day = user.d_day;
-        await this.userRepository.save(userData);
+        return await this.userRepository.save(userData);
     }
 }

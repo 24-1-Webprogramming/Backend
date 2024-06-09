@@ -15,6 +15,8 @@ import { Group } from './entities/groups.entity';
 import { GroupMember } from './entities/group_members.entity';
 import { GymModule } from './gym/gym.module';
 import { Gym } from './entities/gyms.entity';
+import { Image_assets } from './entities/image_assets.entity';
+import { Stat } from './entities/user_stats.entity';
 
 @Module({
   imports: [
@@ -29,7 +31,7 @@ import { Gym } from './entities/gyms.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: 'health',
-      entities: [Users, Onboard_conditions, User_diets, Group, GroupMember, Gym],
+      entities: [Users, Onboard_conditions, User_diets, Group, GroupMember, Gym, Image_assets, Stat],
       synchronize: false,
       logging: false,
     }),

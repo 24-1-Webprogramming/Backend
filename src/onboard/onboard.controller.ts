@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { OnboardService } from './onboard.service';
 import { JwtServiceAuthGuard } from 'src/auth/guards/jwt-service.guard';
 import { onboardDto } from './dto/onboard.dto';
@@ -14,9 +14,10 @@ export class OnboardController {
     @ApiBearerAuth()
     @ApiOperation({summary: 'onboard 설정', description: '사용자의 onboard를 설정한다. 없으면 생성하고, 있으면 덮어쓴다. '})
     @Post("setOnboard")
+    @ApiResponse({ status: 201, description: 'success'})
     @ApiBody({type: onboardDto})
     @UseGuards(JwtServiceAuthGuard)
-    async setOnboard(@Body() body, @Req() req, @Res() res){
+    async setOnboard(@Body() body, @Req() req, @Res() res) {
         let onboard = await this.onboardService.find(req);
         await this.onboardService.saveData(body);
         let info: string = (onboard = null) ? "successfully created" : "successfully changed";
@@ -27,17 +28,17 @@ export class OnboardController {
 
     @ApiBearerAuth()
     @ApiOperation({summary: 'onboard 조회', description: '사용자의 onboard를 조회한다. '})
+    @ApiResponse({ status: 200, description: 'success', type: onboardDto})
     @Get("checkOnboard")
     @UseGuards(JwtServiceAuthGuard)
     async checkOnboard(@Req() req, @Res() res){
         let onboard = await this.onboardService.find(req);
-        res.status(HttpStatus.OK).json({
-            value: onboard
-        })
+        res.status(HttpStatus.OK).json(onboard)
     }
 
     @ApiBearerAuth()
     @ApiOperation({summary: 'onboard 삭제', description: '사용자의 onboard를 삭제한다. '})
+    @ApiResponse({ status: 200, description: 'success - 삭제된 온보딩', type: onboardDto})
     @Delete("removeOnboard")
     @UseGuards(JwtServiceAuthGuard)
     async deleteOnboard(@Req() req, @Res() res){
