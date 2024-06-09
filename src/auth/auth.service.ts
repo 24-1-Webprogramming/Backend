@@ -102,8 +102,11 @@ export class AuthService {
             } as CreateUserDto;
             user = await this.postJoin(input);
         }
-        console.log(user);
-        return await this.loginServiceUser(user);
+        let data = {
+            token: await this.loginServiceUser(user),
+            refresh: await this.generateRefreshToken(user)
+        }
+        return data;
     }
 
     async findJwtUser(req){
