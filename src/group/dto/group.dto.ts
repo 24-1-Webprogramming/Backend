@@ -1,5 +1,16 @@
 import { ApiProperty, PickType } from "@nestjs/swagger";
 
+export class GroupDto {
+    @ApiProperty()
+    family_id: number
+    @ApiProperty()
+    name: string
+    @ApiProperty()
+    score: number
+    @ApiProperty()
+    group_code: number
+}
+
 export class CreateGroupDto {
     @ApiProperty()
     name: string

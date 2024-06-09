@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { DietService } from './diet.service';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User_diets } from 'src/entities/user_diets.entity';
 import { JwtServiceAuthGuard } from 'src/auth/guards/jwt-service.guard';
 import { createDietDto, dietDto } from './dto/diet.dto';
@@ -15,10 +15,14 @@ export class DietController {
     ){}
     @ApiBearerAuth()
     @ApiOperation({summary: '식단 등록', description: '새로운 식단을 등록한다 만약 존재한다면 덮어쓴다'})
-    @ApiBody({type: createDietDto})
-    @Post("setDiet")
+    @ApiResponse({ 
+        status: 200, 
+        description: 'success',
+        type: String
+    })
     @ApiBody({type: dietDto})
     @UseGuards(JwtServiceAuthGuard)
+    @Post("setDiet")
     async setDiet(@Body() body: dietDto, @Req() req, @Res() res){
         let data: dietDto = body;
         data.user_id = await this.dietService.getUserId(req);
@@ -30,6 +34,15 @@ export class DietController {
 
     @ApiBearerAuth()
     @Post("findWithDay")
+    @ApiResponse({ 
+        status: 302,
+        description: 'success',
+        type: dietDto
+    })
+    @ApiResponse({ 
+        status: 204,
+        description: 'no diets'
+    })
     @ApiOperation({summary: '식단 검색 (날짜)', description: '해당 사용자가 해당 날짜에 등록해둔 식단을 반환한다'})
     @ApiBody({type: FindDietDto})
     @UseGuards(JwtServiceAuthGuard)
@@ -42,6 +55,11 @@ export class DietController {
 
     @ApiBearerAuth()
     @Post("findAll")
+    @ApiResponse({ 
+        status: 302,
+        description: 'success *결과는 리스트로 출력됩니다*',
+        type: dietDto
+    })
     @UseGuards(JwtServiceAuthGuard)
     @ApiOperation({summary: '식단 검색 (전체)', description: '해당 사용자의 모든 식단을 반환한다'})
     async findAll(@Req() req, @Res() res){

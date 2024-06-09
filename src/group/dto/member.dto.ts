@@ -8,3 +8,19 @@ export class CreateMemberDto {
     @ApiProperty()
     is_leader: Boolean
 }
+
+export class SetLeaderDto {
+    @ApiProperty()
+    target_user_id: string
+    @ApiProperty()
+    group_id: number
+}
+
+export class MemberDto {
+    @ApiProperty()
+    user_id: string
+    @ApiProperty()
+    group_id: number
+    @ApiProperty()
+    is_leader: boolean
+}

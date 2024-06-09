@@ -8,12 +8,15 @@ export class Stat {
   @Column({ type: 'varchar', length: 255, nullable: false })
   user_id: string;
 
-  @Column({ type: 'date', nullable: true })
-  data_log: Date;
-
-  @Column({ type: 'int', nullable: true, default: null })
+  @Column({ type: 'int', nullable: true, default: null, unsigned: true })
   health_score: number;
 
-  @Column({ type: 'float', nullable: true, default: null })
+  @Column({ type: 'float', nullable: true, default: null, unsigned: true })
   weight: number;
+
+  @Column({ type: 'int', nullable: true, default: null, unsigned: true })
+  gym_id: number;
+
+  @Column({ type: 'date', nullable: true })
+  date_log: Date;
 }
