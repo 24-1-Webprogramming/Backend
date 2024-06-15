@@ -49,7 +49,7 @@ export class AuthController {
         res.status(HttpStatus.OK).json({
             info: "success",
             token: await token.token,
-            refreshToken: await refreshToken
+            refreshToken: refreshToken
         });
     }
 
@@ -86,7 +86,7 @@ export class AuthController {
         type: UserDto
     })
     @UseGuards(JwtServiceAuthGuard)
-    @Get('profile')
+    @Post('profile')
     async getProfile(@Req() req, @Res() res) {
         let user = await this.authService.findJwtUser(req);
         res.status(HttpStatus.FOUND).json({

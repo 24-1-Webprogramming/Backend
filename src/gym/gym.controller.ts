@@ -11,7 +11,7 @@ export class GymController {
     ) {}
 
     @ApiBearerAuth()
-    @Get('searchGymByLocal')
+    @Post('searchGymByLocal')
     @ApiOperation({summary: '헬스장 검색 AI', description: '해당 지역의 헬스장을 찾는다 ex) "상도동" '})
     @ApiBody({type: SearchGymDto})
     @ApiResponse({ status: 200, description: 'FOUND', type: GymDto})

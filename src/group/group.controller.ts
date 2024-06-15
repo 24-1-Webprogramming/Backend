@@ -50,7 +50,7 @@ export class GroupController {
     @ApiBody({type: String})
     @ApiResponse({ status: 200, description: 'found', type: GroupDto})
     @UseGuards(JwtServiceAuthGuard)
-    @Get('checkGroupByCode')
+    @Post('checkGroupByCode')
     async checkGroupByCode(@Body() body: SearchGroupDto, @Res() res){
         let foundGroup = await this.groupService.findGroupById(body);
         res.status(HttpStatus.OK).json(foundGroup);
@@ -60,7 +60,7 @@ export class GroupController {
     @ApiOperation({summary: '그룹 검색 (user_id)', description: '해당 유저를 포함하는 그룹 연결을 찾는다'})
     @ApiResponse({ status: 200, description: 'found *List로 반환합니다*', type: GroupDto})
     @UseGuards(JwtServiceAuthGuard)
-    @Get('checkGroupByUserId')
+    @Post('checkGroupByUserId')
     async checkGroupByUserId(@Req() req: Request, @Res() res){
         let memberList = await this.groupService.findMemberByUserId(req);
         res.status(HttpStatus.OK).json(memberList);
@@ -200,7 +200,7 @@ export class GroupController {
         res.status(HttpStatus.OK).json({ans});
     }
 
-    @Get('getGroupScore')
+    @Post('getGroupScore')
     @ApiBearerAuth()
     @ApiOperation({summary: '그룹원들 점수 합산', description: '그룹원들의 점수를 합산해서 반환합니다. (팀점수를 반환합니다)'})
     @ApiBody({type: SearchGroupDto})

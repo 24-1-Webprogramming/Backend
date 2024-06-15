@@ -17,7 +17,6 @@ export class Users {
 
   @Column({
     type: 'boolean',
-    unique: true,
     nullable: true
   })
   is_man: boolean | null;
