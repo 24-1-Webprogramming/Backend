@@ -10,7 +10,7 @@ export function setupSwagger(app: INestApplication): void {
   const options = new DocumentBuilder()
     .setTitle('NestJS API - hogun')
     .setDescription('webprogramming API')
-    .setVersion('1.0.4')
+    .setVersion('1.0.5')
     .build();
 
   const document = SwaggerModule.createDocument(app, options);

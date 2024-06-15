@@ -17,10 +17,10 @@ export class OnboardService {
      * @param req 객체
      * @return JSON Onboard_conditions
      */
-    async find(req: Request){
+    async findOnboard(req: Request){
         let token: string = req.headers['authorization'].replace('Bearer ', '');
         const decodedToken = this.jwtService.verify(token, {secret: this.configService.get('SECRET_KEY')});
-        let onboard = await this.onboardRepository.findOne({where: {user_id: decodedToken.user_id}});
+        let onboard = await this.onboardRepository.findOne({where: {user_id: decodedToken.id}});
         return onboard;
     }
     /**
