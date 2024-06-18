@@ -6,13 +6,12 @@ import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.int
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const corsOptions: CorsOptions = {
-    origin: 'http://localhost:3000', // 클라이언트의 출처 (React 앱이 호스팅되는 곳)
+  app.enableCors({
+    origin: '*', // 모든 도메인 허용
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type, Accept',
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-  };
+    allowedHeaders: 'Content-Type, Accept, Authorization, Origin, X-Requested-With',
+    credentials: true,
+  });
 
   setupSwagger(app);
 

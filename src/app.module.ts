@@ -25,6 +25,8 @@ import { ExerciseRecordModule } from './exercise-record/exercise-record.module';
 import { ExerciseRecord } from './entities/exercise-record.entity';
 import { ExerciseCompletionModule } from './exercise-completion/exercise-completion.module';
 import { ExerciseCompletion } from './entities/exercise-completion.entity';
+import { Weight } from './entities/weight.entity';
+import { WeightModule } from './weight/weight.module';
 
 @Module({
   imports: [
@@ -39,7 +41,7 @@ import { ExerciseCompletion } from './entities/exercise-completion.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: 'health',
-      entities: [Users, Onboard_conditions, User_diets, Group, GroupMember, Gym, Image_assets, Stat, Exercise, Routine, ExerciseRecord, ExerciseCompletion],
+      entities: [Users, Onboard_conditions, User_diets, Group, GroupMember, Gym, Image_assets, Stat, Exercise, Routine, ExerciseRecord, ExerciseCompletion, Weight],
       synchronize: false,
       logging: false,
     }),
@@ -52,6 +54,7 @@ import { ExerciseCompletion } from './entities/exercise-completion.entity';
     RoutineModule,
     ExerciseRecordModule,
     ExerciseCompletionModule,
+    WeightModule,
   ],
   controllers: [AppController],
   providers: [AppService],
