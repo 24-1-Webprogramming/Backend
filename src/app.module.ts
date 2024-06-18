@@ -17,6 +17,14 @@ import { GymModule } from './gym/gym.module';
 import { Gym } from './entities/gyms.entity';
 import { Image_assets } from './entities/image_assets.entity';
 import { Stat } from './entities/user_stats.entity';
+import { ExerciseModule } from './exercise/exercise.module';
+import { Exercise } from './entities/exercise.entity';
+import { RoutineModule } from './routine/routine.module';
+import { Routine } from './entities/routine.entity';
+import { ExerciseRecordModule } from './exercise-record/exercise-record.module';
+import { ExerciseRecord } from './entities/exercise-record.entity';
+import { ExerciseCompletionModule } from './exercise-completion/exercise-completion.module';
+import { ExerciseCompletion } from './entities/exercise-completion.entity';
 
 @Module({
   imports: [
@@ -31,7 +39,7 @@ import { Stat } from './entities/user_stats.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: 'health',
-      entities: [Users, Onboard_conditions, User_diets, Group, GroupMember, Gym, Image_assets, Stat],
+      entities: [Users, Onboard_conditions, User_diets, Group, GroupMember, Gym, Image_assets, Stat, Exercise, Routine, ExerciseRecord, ExerciseCompletion],
       synchronize: false,
       logging: false,
     }),
@@ -40,6 +48,10 @@ import { Stat } from './entities/user_stats.entity';
     DietModule,
     GroupModule,
     GymModule,
+    ExerciseModule,
+    RoutineModule,
+    ExerciseRecordModule,
+    ExerciseCompletionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

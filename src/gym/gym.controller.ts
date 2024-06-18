@@ -1,7 +1,8 @@
-import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Query, Res } from '@nestjs/common';
 import { GymService } from './gym.service';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GymDto, SearchGymDto } from './dto/gym.dto';
+import { CreateGymDto } from './dto/create-gym.dto';
 
 @ApiTags('gym API')
 @Controller('gym')
@@ -20,4 +21,27 @@ export class GymController {
         let gymList = await this.gymService.findByLocal(body);
         res.status(HttpStatus.OK).json(gymList);
     }
+
+  @Post()
+  async createGym(@Body() createGymDto: CreateGymDto) {
+    return this.gymService.createGym(createGymDto);
+  }
+
+  @Get()
+  async getGyms() {
+    return this.gymService.getGyms();
+  }
+
+  @Get(':id')
+  async getGymById(@Param('id') id: number) {
+    return this.gymService.getGymById(id);
+  }
+
+  @Get('location')
+  async getGymsByLocation(
+    @Query('latitude') latitude: number,
+    @Query('longitude') longitude: number
+  ) {
+    return this.gymService.getGymsByLocation(latitude, longitude);
+  }
 }
