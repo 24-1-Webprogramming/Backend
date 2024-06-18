@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ExerciseItem } from '../entities/exercise-item.entity';
 import { MainPageDataDto, ExerciseDetailDto } from 'src/auth/dto/main-page-data.dto';
+import { ExerciseItemDto } from 'src/exercise/dto/exercise-item.dto'; // 수정된 경로
 
 @Injectable()
 export class ExerciseService {
@@ -36,5 +37,16 @@ export class ExerciseService {
       totalCalories,
       exerciseDetails, // 올바른 필드 이름 사용
     };
+  }
+
+  async getExerciseItems(): Promise<ExerciseItemDto[]> {
+    const exerciseItems = await this.exerciseItemRepository.find();
+    return exerciseItems.map(item => ({
+      item_id: item.item_id,
+      category: item.category,
+      exercise_name: item.exercise_name,
+      gif_url: item.gif_url,
+      description: item.description,
+    }));
   }
 }
