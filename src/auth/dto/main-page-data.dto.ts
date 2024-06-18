@@ -9,6 +9,9 @@ export class ExerciseDetailDto {
 
   @ApiProperty({ description: '운동 설명' })
   description: string;
+
+  @ApiProperty({ description: 'GIF 이미지 URL' })
+  gif_url: string;
 }
 
 export class MainPageDataDto {
