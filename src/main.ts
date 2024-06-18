@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { setupSwagger } from './util/swagger';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,6 +15,14 @@ async function bootstrap() {
   });
 
   setupSwagger(app);
+
+  app.use('/auth/googleLogin', createProxyMiddleware({
+    target: 'https://accounts.google.com',
+    changeOrigin: true,
+    pathRewrite: {
+      '^/auth/googleLogin': '/o/oauth2/v2/auth', // 프록시 경로 재작성
+    },
+  }));
 
   await app.listen(3000);
 }
