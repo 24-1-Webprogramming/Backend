@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ExerciseItem } from '../entities/exercise-item.entity';
 import { MainPageDataDto, ExerciseDetailDto } from 'src/auth/dto/main-page-data.dto';
-import { ExerciseItemDto } from 'src/exercise/dto/exercise-item.dto'; // 수정된 경로
+import { ExerciseItemDto } from './dto/exercise-item.dto';
 
 @Injectable()
 export class ExerciseService {
@@ -48,5 +48,19 @@ export class ExerciseService {
       gif_url: item.gif_url,
       description: item.description,
     }));
+  }
+
+  async getExerciseItemById(itemId: number): Promise<ExerciseItemDto> {
+    const exerciseItem = await this.exerciseItemRepository.findOne({ where: { item_id: itemId } }); // 수정된 부분
+    if (!exerciseItem) {
+      throw new NotFoundException(`Exercise item with ID ${itemId} not found`);
+    }
+    return {
+      item_id: exerciseItem.item_id,
+      category: exerciseItem.category,
+      exercise_name: exerciseItem.exercise_name,
+      gif_url: exerciseItem.gif_url,
+      description: exerciseItem.description,
+    };
   }
 }
