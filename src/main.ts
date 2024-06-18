@@ -2,19 +2,27 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { setupSwagger } from './util/swagger';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const corsOptions: CorsOptions = {
-    origin: 'http://localhost:3000', // 클라이언트의 출처 (React 앱이 호스팅되는 곳)
+  app.enableCors({
+    origin: '*', // 모든 도메인 허용
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type, Accept',
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-  };
+    allowedHeaders: 'Content-Type, Accept, Authorization, Origin, X-Requested-With',
+    credentials: true,
+  });
 
   setupSwagger(app);
+
+  app.use('/auth/googleLogin', createProxyMiddleware({
+    target: 'https://accounts.google.com',
+    changeOrigin: true,
+    pathRewrite: {
+      '^/auth/googleLogin': '/o/oauth2/v2/auth', // 프록시 경로 재작성
+    },
+  }));
 
   await app.listen(3000);
 }
