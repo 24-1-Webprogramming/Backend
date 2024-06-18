@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Exercise } from 'src/entities/exercise.entity';
 import { Users } from 'src/entities/users.entity';
 import { Repository } from 'typeorm';
+import { MainPageDataDto, ExerciseDetailDto } from 'src/auth/dto/main-page-data.dto';
 
 @Injectable()
 export class ExerciseService {
@@ -13,7 +14,7 @@ export class ExerciseService {
     private readonly userRepository: Repository<Users>,
   ) {}
 
-  async getMainPageData(userId: string): Promise<any> {
+  async getMainPageData(userId: string): Promise<MainPageDataDto> {
     const user = await this.userRepository.findOne({ where: { user_id: userId }, relations: ['exercises'] });
     if (!user) {
       throw new Error('User not found');
@@ -22,9 +23,8 @@ export class ExerciseService {
     const exercises = await this.exerciseRepository.find({ where: { user: { user_id: userId } } });
     const totalDuration = exercises.reduce((sum, exercise) => sum + exercise.duration, 0);
     const totalCalories = exercises.reduce((sum, exercise) => sum + exercise.caloriesBurned, 0);
-    const routineCompletionRate = this.calculateRoutineCompletionRate(user);
 
-    const exerciseDetails = exercises.map(exercise => ({
+    const exerciseDetails: ExerciseDetailDto[] = exercises.map(exercise => ({
       date: exercise.date,
       duration: exercise.duration,
       caloriesBurned: exercise.caloriesBurned,
@@ -40,14 +40,7 @@ export class ExerciseService {
       totalDuration,
       totalExercises: exercises.length,
       totalCalories,
-      routineCompletionRate,
       exerciseDetails,
     };
-  }
-
-  private calculateRoutineCompletionRate(user: Users): number {
-    const completedRoutines = user.exercises.filter(exercise => exercise.isCompleted).length;
-    const totalRoutines = user.exercises.length;
-    return totalRoutines ? (completedRoutines / totalRoutines) * 100 : 0;
   }
 }

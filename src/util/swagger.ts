@@ -11,7 +11,6 @@ export function setupSwagger(app: INestApplication): void {
     .setTitle('NestJS API - hogun')
     .setDescription('webprogramming API')
     .setVersion('2.0.2')
-    .build();
 
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api-docs', app, document);
