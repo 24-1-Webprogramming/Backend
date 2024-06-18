@@ -16,14 +16,6 @@ async function bootstrap() {
 
   setupSwagger(app);
 
-  app.use('/auth/googleLogin', createProxyMiddleware({
-    target: 'https://accounts.google.com',
-    changeOrigin: true,
-    pathRewrite: {
-      '^/auth/googleLogin': '/o/oauth2/v2/auth', // 프록시 경로 재작성
-    },
-  }));
-
   await app.listen(3000);
 }
 bootstrap();
