@@ -5,6 +5,7 @@ import { Gym } from 'src/entities/gyms.entity';
 import { Like, Repository } from 'typeorm';
 import { SearchGymDto } from './dto/gym.dto';
 import { Image_assets } from 'src/entities/image_assets.entity';
+import { CreateGymDto } from './dto/create-gym.dto';
 
 @Injectable()
 export class GymService {
@@ -31,5 +32,23 @@ export class GymService {
             //finalGymList.push(gymdata);
         //}
         return finalGymList;
+    }
+
+    async createGym(createGymDto: CreateGymDto): Promise<Gym> {
+        const newGym = this.gymRepository.create(createGymDto);
+        return this.gymRepository.save(newGym);
+    }
+    
+    async getGyms(): Promise<Gym[]> {
+        return this.gymRepository.find();
+    }
+    
+    async getGymById(gymId: number): Promise<Gym> {
+        return this.gymRepository.findOne({ where: { gym_id: gymId } });
+    }
+    
+    async getGymsByLocation(latitude: number, longitude: number): Promise<Gym[]> {
+        // You can implement a more sophisticated location-based search here
+        return this.gymRepository.find();
     }
 }

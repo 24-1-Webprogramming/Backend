@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, OneToMany } from 'typeorm';
+import { Exercise } from './exercise.entity';
+import { Routine } from './routine.entity';
 
 @Entity('users')
 export class Users {
@@ -33,5 +35,21 @@ export class Users {
     nullable: true
   })
   password: string | null;
+
+  @Column({
+    type: 'boolean',
+    nullable: true
+  })
+  isFirstLogin: boolean | null;
+
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true
+  })
+  profile: string | null;
+
+  @OneToMany(() => Exercise, exercise => exercise.user)
+  exercises: Exercise[];
 }
 
