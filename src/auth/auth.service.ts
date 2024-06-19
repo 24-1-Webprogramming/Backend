@@ -91,7 +91,10 @@ export class AuthService {
 
     async googleLogin(req){
         let user = await this.userRepository.findOne({where: {'user_id': await req.user.providerId}});
+        console.log(user);
         if (!user) {
+            (req.session as any).redirectUrl = "http://localhost:3000/onboarding";
+            console.log(req.query.redirectUrl);
             const input = {
                 user_id: await req.user.providerId,
                 nickname: null,

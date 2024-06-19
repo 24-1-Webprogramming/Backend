@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpStatus, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiForbiddenResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto, UpdateUserDto, UserDto, acessTokenDto, tokensDto } from './dto/user.dto';
 import { LocalServiceStrategy } from './guards/local-service.guard';
@@ -53,10 +53,11 @@ export class AuthController {
         });
     }
 
-    @ApiOperation({summary: '구글 로그인', description: '구글 계정에서 고유 식별 번호를 요청받는다 이후 google/callback으로 리다이렉트 한다'})
+    @ApiOperation({summary: '구글 로그인', description: '구글 계정에서 고유 식별 번호를 요청받는다 이후 google/callback으로 리디렉트 한다 -> 결과적으로 첫 로그인이면 http://localhost:3000/onboard로, 아니면 지정한 곳으로 리디렉트한다. '})
     @ApiResponse({
         type: tokensDto
     })
+    @ApiQuery({ name: 'redirectUrl', required: true, description: 'redirect할 주소' })
     @Get('googleLogin')
     @UseGuards(GoogleGuard)
     async googleAuthCallback(@Res() res){
@@ -73,7 +74,6 @@ export class AuthController {
         
         const redirectUrl = req.session.redirectUrl || '/';
         delete req.session.redirectUrl;
-        console.log(redirectUrl);
 
         const finalUrl = `${redirectUrl}?token=${data.token}&refresh=${data.refresh}`;
         res.redirect(finalUrl);
