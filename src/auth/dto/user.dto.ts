@@ -23,6 +23,8 @@ export class LoginUserDto {
 
 export class UpdateUserDto {
     @ApiProperty()
+    user_id: string;
+    @ApiProperty()
     nickname: string;
     @ApiProperty()
     is_man: boolean;
@@ -55,4 +57,18 @@ export class tokensDto {
 export class acessTokenDto {
     @ApiProperty()
     token: string;
+}
+
+export class findUserDto {
+    @ApiProperty()
+    user_id: string;
+}
+
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString } from 'class-validator';
+
+export class GoogleTokenDto {
+  @ApiProperty()
+  @IsString()
+  credential: string;
 }

@@ -9,16 +9,14 @@ export class JwtServiceStrategy extends PassportStrategy(Strategy, 'jwt-service'
         private readonly configService: ConfigService
     ) {
         super({
-            secretOrKey: configService.get('SECRET_KEY'),
+            secretOrKey: "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",
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
         });
     }
 
     async validate(payload: any) {
-        if (payload.type !== 'access') {
-            throw new UnauthorizedException('Invalid token type');
-        }
+        console.log(payload);
         return {
             user_id: payload.user_id,
             nickname: payload.nickname,

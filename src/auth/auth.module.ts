@@ -9,6 +9,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocalServiceStrategy } from './strategies/local-service.strategy';
 import { JwtServiceStrategy } from './strategies/jwt-service.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { JwtStrategy } from './strategies/newStrategy.strategy';
+import { JwtAuthGuard } from './guards/newguard.guard';
 
 
 @Module({
@@ -16,6 +18,11 @@ import { GoogleStrategy } from './strategies/google.strategy';
     TypeOrmModule.forFeature([Users]),
     PassportModule.register({ session: false }),
     ConfigModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.register({}),
+
+    //legacy
+    /*
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
@@ -25,10 +32,10 @@ import { GoogleStrategy } from './strategies/google.strategy';
         };
       },
       inject: [ConfigService],
-    })
+    })*/
   ],
-  providers: [AuthService, LocalServiceStrategy, JwtServiceStrategy, GoogleStrategy],
+  providers: [AuthService, LocalServiceStrategy, JwtServiceStrategy, GoogleStrategy, JwtStrategy, JwtAuthGuard],
   controllers: [AuthController],
-  exports: [AuthService]
+  exports: [AuthService, JwtAuthGuard]
 })
 export class AuthModule {}
