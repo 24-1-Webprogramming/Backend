@@ -76,7 +76,6 @@ export class AuthController {
         res.redirect(redirectUrl);
     }
     
-    @ApiBearerAuth()
     @ApiOperation({summary: '프로필', description: 'get my profile'})
     @ApiResponse({
         status: 302, 
@@ -109,7 +108,6 @@ export class AuthController {
         res.status(HttpStatus.OK).json(ans);
     }
 
-    @ApiBearerAuth()
     @ApiOperation({summary: '토큰 refresh', description: 'refresh token을 bearer헤더로 두면 새로운 jwt token을 발급한다'})
     @ApiResponse({ 
         status: 200, 
@@ -129,7 +127,6 @@ export class AuthController {
         res.status(HttpStatus.OK);
     }
 
-    @ApiBearerAuth()
     @ApiOperation({summary: 'secession', description: 'delete user record'})
     @UseGuards(JwtStrategy)
     @ApiResponse({ 

@@ -22,7 +22,6 @@ export class DietController {
         type: String
     })
     @ApiBody({type: dietDto})
-    @UseGuards(JwtStrategy)
     @Post("setDiet")
     async setDiet(@Body() body: dietDto, @Res() res){
         let data: dietDto = body;
@@ -47,7 +46,6 @@ export class DietController {
     })
     @ApiOperation({summary: '식단 검색 (날짜)', description: '해당 사용자가 해당 날짜에 등록해둔 식단을 반환한다'})
     @ApiBody({type: FindDietDto})
-    @UseGuards(JwtStrategy)
     async findWithDay(@Body() body: FindDietDto, @Res() res){
         console.log("!@3r4f23ergbeftrgt");
         let diets = await this.dietService.findWithDay(body);
@@ -63,7 +61,6 @@ export class DietController {
         description: 'success *결과는 리스트로 출력됩니다*',
         type: dietDto
     })
-    @UseGuards(JwtStrategy)
     @ApiOperation({summary: '식단 검색 (전체)', description: '해당 사용자의 모든 식단을 반환한다'})
     async findAll(@Body() body: UserIdDto, @Res() res){
         let diets = await this.dietService.findAll(body);
@@ -74,7 +71,6 @@ export class DietController {
     @ApiBearerAuth()
     @Delete("deleteWithId")
     @ApiOperation({summary: '식단 정보 삭제 (id)', description: '해당 id를 가진 식단 record를 삭제한다.'})
-    @UseGuards(JwtStrategy)
     @ApiBody({type: DeleteDieWithIdtDto})
     async deleteWithId(@Body() body: DeleteDieWithIdtDto, @Res() res){
         await this.dietService.deleteDietWithId(body);
@@ -86,7 +82,6 @@ export class DietController {
     @ApiBearerAuth()
     @Delete("deleteWithType")
     @ApiOperation({summary: '식단 검색 (날짜, 종류)', description: '해당 사용자가 해당 날짜에 등록해둔 해당 종류의 식단을 삭제한다.'})
-    @UseGuards(JwtStrategy)
     @ApiBody({type: DeleteDieWithTypeDto})
     async deleteWithType(@Body() body: DeleteDieWithTypeDto, @Res() res){
         let ans = await this.dietService.deleteDietWithType(body);
