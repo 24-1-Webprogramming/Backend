@@ -6,6 +6,7 @@ import { User_diets } from 'src/entities/user_diets.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtServiceStrategy } from 'src/auth/strategies/jwt-service.strategy';
+import { JwtStrategy } from 'src/auth/strategies/newStrategy.strategy';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { JwtServiceStrategy } from 'src/auth/strategies/jwt-service.strategy';
       inject: [ConfigService],
     })
   ],
-  providers: [DietService, JwtServiceStrategy],
+  providers: [DietService, JwtServiceStrategy, JwtStrategy],
   controllers: [DietController]
 })
 export class DietModule {}

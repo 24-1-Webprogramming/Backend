@@ -1,4 +1,5 @@
 import { ApiProperty, PickType } from "@nestjs/swagger";
+import { IsString } from "class-validator";
 import { Users } from "src/entities/users.entity";
 
 export class CreateUserDto {
@@ -63,9 +64,6 @@ export class findUserDto {
     @ApiProperty()
     user_id: string;
 }
-
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
 
 export class GoogleTokenDto {
   @ApiProperty()
