@@ -82,7 +82,6 @@ export class AuthController {
         description: '사용자의 프로필을 반환',
         type: UserDto
     })
-    @UseGuards(JwtStrategy)
     @Post('profile')
     async getProfile(@Req() req, @Body() body: findUserDto, @Res() res) {
         let user = await this.authService.findUser(body);
@@ -128,7 +127,6 @@ export class AuthController {
     }
 
     @ApiOperation({summary: 'secession', description: 'delete user record'})
-    @UseGuards(JwtStrategy)
     @ApiResponse({ 
         status: 200, 
         description: 'success',
