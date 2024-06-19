@@ -11,6 +11,8 @@ export class CreateMemberDto {
 
 export class SetLeaderDto {
     @ApiProperty()
+    user_id: string
+    @ApiProperty()
     target_user_id: string
     @ApiProperty()
     group_id: number

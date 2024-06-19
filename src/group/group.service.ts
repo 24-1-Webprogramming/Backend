@@ -8,8 +8,9 @@ import { Repository } from 'typeorm';
 import { CreateMemberDto, SetLeaderDto } from './dto/member.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { GroupCodeDto, SearchGroupDto, SetGroupDto } from './dto/group.dto';
+import { CreateGroupDto, GroupCodeDto, SearchGroupDto, SetGroupDto } from './dto/group.dto';
 import { Stat } from 'src/entities/user_stats.entity';
+import { UserIdDto } from 'src/diet/dto/find-diet.dto';
 
 @Injectable()
 export class GroupService {
@@ -40,17 +41,17 @@ export class GroupService {
         return await this.statRepository.findOne({where: {user_id: user_id}});
     }
 
-    async makeGroup(name: string, req: Request){
-        let legacy = await this.groupRepository.findOne({where: {name: name}});
+    async makeGroup(data: CreateGroupDto){
+        let legacy = await this.groupRepository.findOne({where: {name: data.name}});
         if (legacy){
             throw new BadRequestException('group name is already exist');
         }
-        const newGroup = this.groupRepository.create({ name });
+        const newGroup = this.groupRepository.create({ name: data.name });
         let createdGroup = await this.groupRepository.save(newGroup);
 
         //사용자(멤버) 등록
         let memberData: CreateMemberDto = {
-            user_id: (await this.findJwtUser(req)).user_id,
+            user_id: data.user_id,
             group_id: createdGroup.family_id,
             is_leader: true
         }
@@ -63,10 +64,9 @@ export class GroupService {
         return await this.memberRepository.find({where: {group_id: data.search_id}});
     }
 
-    async deleteGroup(data: SearchGroupDto, req: Request) {
+    async deleteGroup(data: SearchGroupDto) {
         let group = await this.findGroupById(data);
-        let user = await this.findJwtUser(req);
-        let leader = await this.memberRepository.findOne({where: {group_id: data.search_id, user_id: user.user_id}});
+        let leader = await this.memberRepository.findOne({where: {group_id: data.search_id, user_id: data.user_id}});
         if (!leader.is_leader) { throw new UnauthorizedException("You are not a leader"); }
         let members = await this.findGroupMember(data);
         for (let member of members) {
@@ -79,9 +79,8 @@ export class GroupService {
         return await this.groupRepository.findOne({where:{family_id: code.search_id}});
     }
 
-    async findMemberByUserId(req: Request){
-        const user = await this.findJwtUser(req);
-        return await this.memberRepository.find({where:{user_id:user.user_id}});
+    async findMemberByUserId(data: UserIdDto){
+        return await this.memberRepository.find({where:{user_id:data.user_id}});
     }
 
     async findMemberByGroupId(data: SearchGroupDto){
@@ -97,7 +96,7 @@ export class GroupService {
         let randCode = ""
         while(dup){
             randCode = await this.generateRandomCode(16);
-            let searchCode: GroupCodeDto = {code: randCode};
+            let searchCode: GroupCodeDto = {code: randCode, user_id: ''};
             let ans = await this.searchGroupByCode(searchCode);
             if (!ans){
                 dup = false;
@@ -115,31 +114,29 @@ export class GroupService {
         return await this.groupRepository.save(group);
     }
 
-    async joinWithInvitation(data: GroupCodeDto, req: Request){
+    async joinWithInvitation(data: GroupCodeDto){
         let group = await this.searchGroupByCode(data);
         if (!group){
             throw new NotFoundException(`There no groupcode is ${data.code}`);
         }
-        let member = await this.findMemberByUserId(req);
+        let member = await this.findMemberByUserId({user_id: data.user_id});
         member.forEach((g) => {
             if (group.family_id == g.group_id) {
                 throw new InternalServerErrorException(`Already Joined`);
             }
         })
-        let user = await this.findJwtUser(req);
         let newMember: CreateMemberDto = {
-            user_id: user.user_id,
+            user_id: data.user_id,
             group_id: group.family_id,
             is_leader: false
         }
         return await this.memberRepository.save(newMember);
     }
 
-    async exitGroup(data: SearchGroupDto, req: Request){
+    async exitGroup(data: SearchGroupDto){
         const group = await this.findGroupById(data);
-        const user = await this.findJwtUser(req);
         const member = await this.memberRepository.findOne({
-            where:{group_id: group.family_id, user_id: user.user_id}
+            where:{group_id: group.family_id, user_id: data.user_id}
         });
         if (member.is_leader == true) { throw new ForbiddenException(`leader can't exit group`); }
         return await this.memberRepository.delete(member);
@@ -165,30 +162,27 @@ export class GroupService {
         return await this.groupRepository.save(group);
     }
 
-    async enterGroup(data: SearchGroupDto, req: Request){
+    async enterGroup(data: SearchGroupDto){
         const group = await this.findGroupById(data);
-        const user = await this.findJwtUser(req);
-        let member = await this.memberRepository.findOne({where:{group_id: data.search_id, user_id: user.user_id}});
+        let member = await this.memberRepository.findOne({where:{group_id: data.search_id, user_id: data.user_id}});
         if (member != null) { throw new ConflictException(`alreay exist`); }
         let memberData: CreateMemberDto = {
-            user_id: user.user_id,
+            user_id: data.user_id,
             group_id: group.family_id,
             is_leader: false
         }
         return await this.memberRepository.save(memberData);
     }
 
-    async forceLeader(data: SearchGroupDto, req: Request){
-        const user = await this.findJwtUser(req);
-        let member = await this.memberRepository.findOne({where:{group_id: data.search_id, user_id: user.user_id}});
+    async forceLeader(data: SearchGroupDto){
+        let member = await this.memberRepository.findOne({where:{group_id: data.search_id, user_id: data.user_id}});
         if (member == null) { throw new NotFoundException(`not found`); }
         member.is_leader = true;
         return await this.memberRepository.save(member);
     }
 
-    async setLeader(data: SetLeaderDto, req: Request){
-        const user = await this.findJwtUser(req);
-        let leader = await this.memberRepository.findOne({where:{group_id: data.group_id, user_id: user.user_id}});
+    async setLeader(data: SetLeaderDto){
+        let leader = await this.memberRepository.findOne({where:{group_id: data.group_id, user_id: data.user_id}});
         if (leader.is_leader == false) { throw new UnauthorizedException('You are not leader'); }
         let member = await this.memberRepository.findOne({where:{group_id: data.group_id, user_id: data.target_user_id}});
         if (member == null) { throw new NotFoundException(`There's no member with id ${data.target_user_id}`); }

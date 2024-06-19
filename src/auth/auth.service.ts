@@ -2,22 +2,27 @@ import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/c
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/entities/users.entity';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/user.dto';
+import { CreateUserDto, UpdateUserDto, findUserDto } from './dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Payload } from './payload/payload.interface';
+import { OAuth2Client } from 'google-auth-library';
 
 const bcrypt = require('bcrypt');
 
 @Injectable()
 export class AuthService {
+    private client: OAuth2Client;
+
     constructor(
         @InjectRepository(Users)
         private readonly userRepository: Repository<Users>,
         private readonly configService: ConfigService,
         private jwtService: JwtService,
-    ) {}
+    ) {
+        this.client = new OAuth2Client('241488948308-7719rl1iltknq0c1mnea32tbhg463ac2.apps.googleusercontent.com');
+    }
 
     async postJoin(createUserDto: CreateUserDto) {
         return await this.userRepository.save(createUserDto);
@@ -113,7 +118,7 @@ export class AuthService {
 
     async findJwtUser(req){
         let token: string = req.headers['authorization'].replace('Bearer ', '');
-        const decodeToken = this.jwtService.verify(token,  {secret: this.configService.get('SECRET_KEY')})
+        const decodeToken = this.jwtService.verify(token, {secret: this.configService.get('SECRET_KEY')})
         return await this.userRepository.findOne({where:{user_id: decodeToken.user_id}});
     }
 
@@ -121,11 +126,57 @@ export class AuthService {
         let ans = await this.userRepository.delete({user_id: user.user_id});
     }
 
-    async saveUserData(req: Request, user: Users){
-        let userData = await this.findJwtUser(req);
-        userData.nickname = user.nickname;
-        userData.is_man = user.is_man;
-        userData.d_day = user.d_day;
+    async saveUserData(data: UpdateUserDto, user: Users){
+        let userData = user;
+        userData.nickname = data.nickname;
+        userData.is_man = data.is_man;
+        userData.d_day = data.d_day;
         return await this.userRepository.save(userData);
     }
+    
+    async verifyToken(token: string) {
+        try {
+          const ticket = await this.client.verifyIdToken({
+            idToken: token,
+            audience: '241488948308-7719rl1iltknq0c1mnea32tbhg463ac2.apps.googleusercontent.com',
+          });
+          const payload = ticket.getPayload();
+
+          let isExist = true;
+          let user = await this.userRepository.findOne({where: {user_id: payload.email}});
+          if (!user){
+            isExist = false;
+            const input = {
+                user_id: payload.email,
+                nickname: null,
+                is_man: null,
+                d_day: null,
+                password: null,
+            } as CreateUserDto;
+            await this.postJoin(input);
+          }
+
+
+          return {
+            success: true,
+            isExist: isExist,
+          };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.message,
+            };
+        }
+    }
+
+    async findUser(data: findUserDto){
+        console.log(data);
+        let user = await this.userRepository.findOne({where:{user_id: data.user_id}});
+        console.log(user);
+        return user;
+    }
 }
+
+
+//맞는가, 있냐 없냐
+// googleVerify
