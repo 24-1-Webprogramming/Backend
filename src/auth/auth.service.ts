@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Payload } from './payload/payload.interface';
 import { OAuth2Client } from 'google-auth-library';
+import { Onboard_conditions } from 'src/entities/onboard_conditions.entity';
 
 const bcrypt = require('bcrypt');
 
@@ -18,6 +19,8 @@ export class AuthService {
     constructor(
         @InjectRepository(Users)
         private readonly userRepository: Repository<Users>,
+        @InjectRepository(Onboard_conditions)
+        private readonly onboardRepository: Repository<Onboard_conditions>,
         private readonly configService: ConfigService,
         private jwtService: JwtService,
     ) {
@@ -155,8 +158,11 @@ export class AuthService {
             } as CreateUserDto;
             await this.postJoin(input);
           }
-          else if (user.nickname == null) {
-            isExist = false;
+          else{
+                const onboard = await this.onboardRepository.findOne({where: {user_id: user.user_id}});
+                if (onboard == null) {
+                    isExist = false;
+            }
           }
           return {
             success: true,

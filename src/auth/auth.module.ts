@@ -11,11 +11,12 @@ import { JwtServiceStrategy } from './strategies/jwt-service.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtStrategy } from './strategies/newStrategy.strategy';
 import { JwtAuthGuard } from './guards/newguard.guard';
+import { Onboard_conditions } from 'src/entities/onboard_conditions.entity';
 
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Users]),
+    TypeOrmModule.forFeature([Users, Onboard_conditions]),
     PassportModule.register({ session: false }),
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),

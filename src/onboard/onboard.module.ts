@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { Onboard_conditions } from 'src/entities/onboard_conditions.entity';
 import { JwtServiceStrategy } from 'src/auth/strategies/jwt-service.strategy';
+import { JwtStrategy } from 'src/auth/strategies/newStrategy.strategy';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { JwtServiceStrategy } from 'src/auth/strategies/jwt-service.strategy';
       inject: [ConfigService],
     })
   ],
-  providers: [OnboardService, JwtServiceStrategy ],
+  providers: [OnboardService, JwtServiceStrategy, JwtStrategy],
   controllers: [OnboardController],
 })
 export class OnboardModule {}
