@@ -1,33 +1,28 @@
-import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
-import { Users } from './users.entity';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('exercise_records')
 export class ExerciseRecord {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   exercise_id: number;
 
   @Column()
   date: string;
 
-  @Column()
-  imageUrl: string;
+  @Column({ nullable: true })
+  imageUrl?: string;
 
-  @Column()
-  feeling: string;
+  @Column({ nullable: true })
+  feeling?: string;
 
-  @Column()
-  note: string;
+  @Column({ nullable: true })
+  note?: string;
 
   @Column()
   routine: string;
 
   @Column()
-  calories: number;
+  caloriesBurned: number;
 
   @Column()
   user_id: string;
-
-  @ManyToOne(() => Users, user => user.user_id)
-  @JoinColumn({name: 'user_id'})
-  user: Users;
 }
