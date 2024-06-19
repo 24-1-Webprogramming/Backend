@@ -8,12 +8,12 @@ export class Onboard_conditions {
   @Column({ type: 'varchar', length: 255, nullable: true, default: null })
   purpose: string;
 
-  @Column({ type: 'smallint', width: 5, nullable: true, default: null })
-  period: number;
+  @Column({ type: 'varchar', length: 255, nullable: true, default: null })
+  period: string;
 
-  @Column({ type: 'smallint', width: 5, nullable: true, default: null })
-  push_up: number;
+  @Column({ type: 'varchar', length: 255, nullable: true, default: null })
+  push_up: string;
 
-  @Column({ type: 'smallint', width: 6, nullable: true, default: null })
-  goal: number;
+  @Column({ type: 'varchar', length: 255, nullable: true, default: null })
+  goal: string;
 }

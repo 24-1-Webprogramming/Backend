@@ -6,9 +6,9 @@ export class onboardDto {
     @ApiProperty()
     purpose: string;
     @ApiProperty()
-    period: number;
+    period: string;
     @ApiProperty()
-    push_up: number;
+    push_up: string;
     @ApiProperty()
-    goal: number;
+    goal: string;
 }

@@ -14,6 +14,7 @@ export class DietController {
     constructor(
         private dietService: DietService
     ){}
+    
     @ApiBearerAuth()
     @ApiOperation({summary: '식단 등록', description: '새로운 식단을 등록한다 만약 존재한다면 덮어쓴다'})
     @ApiResponse({ 
@@ -25,8 +26,6 @@ export class DietController {
     @Post("setDiet")
     async setDiet(@Body() body: dietDto, @Res() res){
         let data: dietDto = body;
-        //data.user_id = body.user_id;
-        //await this.dietService.getUser(body.user_id);
         await this.dietService.saveData(data);
         res.status(HttpStatus.CREATED).json({
             info: "create new diet"
@@ -47,9 +46,7 @@ export class DietController {
     @ApiOperation({summary: '식단 검색 (날짜)', description: '해당 사용자가 해당 날짜에 등록해둔 식단을 반환한다'})
     @ApiBody({type: FindDietDto})
     async findWithDay(@Body() body: FindDietDto, @Res() res){
-        console.log("!@3r4f23ergbeftrgt");
         let diets = await this.dietService.findWithDay(body);
-        console.log(diets)
         if (diets.length == 0){ res.status(HttpStatus.NO_CONTENT).json(); }
         res.status(HttpStatus.FOUND).json(diets);
     }
