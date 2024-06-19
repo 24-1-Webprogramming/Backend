@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiForbiddenResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto, UpdateUserDto, UserDto, acessTokenDto, tokensDto } from './dto/user.dto';
@@ -59,7 +59,7 @@ export class AuthController {
     })
     @Get('googleLogin')
     @UseGuards(GoogleGuard)
-    async googleAuthCallback(@Req() req, @Res() res){
+    async googleAuthCallback(@Res() res){
         return res.status(HttpStatus.OK).send();
     }
 
@@ -71,11 +71,12 @@ export class AuthController {
         //res.setHeader('Content-Type', 'application/json; charset=utf-8');
         //res.setHeader('Authorization', 'Bearer ' + data.token);
         
-        res.status(HttpStatus.OK).json({
-            info: "success",
-            token: data.token,
-            refreshToken: data.refresh
-        });
+        const redirectUrl = req.session.redirectUrl || '/';
+        delete req.session.redirectUrl;
+        console.log(redirectUrl);
+
+        const finalUrl = `${redirectUrl}?token=${data.token}&refresh=${data.refresh}`;
+        res.redirect(finalUrl);
     }
     
     @ApiBearerAuth()

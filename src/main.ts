@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { setupSwagger } from './util/swagger';
-import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+const session = require('express-session');
+import { RedirectMiddleware } from './auth/redirect.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +13,16 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Accept, Authorization, Origin, X-Requested-With',
     credentials: true,
   });
+
+  app.use(
+    session({
+      secret: 'my-secret',
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
+
+  app.use(new RedirectMiddleware().use);
 
   setupSwagger(app);
 
