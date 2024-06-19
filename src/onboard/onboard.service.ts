@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserIdDto } from 'src/diet/dto/find-diet.dto';
 import { Onboard_conditions } from 'src/entities/onboard_conditions.entity';
 import { Repository } from 'typeorm';
 
@@ -17,10 +18,8 @@ export class OnboardService {
      * @param req 객체
      * @return JSON Onboard_conditions
      */
-    async findOnboard(req: Request){
-        let token: string = req.headers['authorization'].replace('Bearer ', '');
-        const decodedToken = this.jwtService.verify(token, {secret: this.configService.get('SECRET_KEY')});
-        let onboard = await this.onboardRepository.findOne({where: {user_id: decodedToken.id}});
+    async findOnboard(user: UserIdDto){
+        let onboard = await this.onboardRepository.findOne({where: {user_id: user.user_id}});
         return onboard;
     }
     /**

@@ -26,7 +26,7 @@ import { JwtServiceStrategy } from 'src/auth/strategies/jwt-service.strategy';
       inject: [ConfigService],
     })
   ],
-  providers: [OnboardService, JwtServiceStrategy],
+  providers: [OnboardService, JwtServiceStrategy ],
   controllers: [OnboardController],
 })
 export class OnboardModule {}

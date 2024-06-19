@@ -3,6 +3,8 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nes
 import { OnboardService } from './onboard.service';
 import { JwtServiceAuthGuard } from 'src/auth/guards/jwt-service.guard';
 import { onboardDto } from './dto/onboard.dto';
+import { JwtStrategy } from 'src/auth/strategies/newStrategy.strategy';
+import { UserIdDto } from 'src/diet/dto/find-diet.dto';
 
 @ApiTags('onboard api')
 @Controller('onboard')
@@ -16,9 +18,9 @@ export class OnboardController {
     @Post("setOnboard")
     @ApiResponse({ status: 201, description: 'success'})
     @ApiBody({type: onboardDto})
-    @UseGuards(JwtServiceAuthGuard)
-    async setOnboard(@Body() body, @Req() req, @Res() res) {
-        let onboard = await this.onboardService.findOnboard(req);
+    @UseGuards(JwtStrategy)
+    async setOnboard(@Body() body: onboardDto, @Res() res) {
+        let onboard = await this.onboardService.findOnboard({user_id: body.user_id});
         await this.onboardService.saveData(body);
         let info: string = (onboard = null) ? "successfully created" : "successfully changed";
         res.status(HttpStatus.CREATED).json({
@@ -30,9 +32,9 @@ export class OnboardController {
     @ApiOperation({summary: 'onboard 조회', description: '사용자의 onboard를 조회한다. '})
     @ApiResponse({ status: 200, description: 'success', type: onboardDto})
     @Post("checkOnboard")
-    @UseGuards(JwtServiceAuthGuard)
-    async checkOnboard(@Req() req, @Res() res){
-        let onboard = await this.onboardService.findOnboard(req);
+    @UseGuards(JwtStrategy)
+    async checkOnboard(@Body() body: UserIdDto, @Res() res){
+        let onboard = await this.onboardService.findOnboard(body);
         res.status(HttpStatus.OK).json(onboard)
     }
 
@@ -41,9 +43,9 @@ export class OnboardController {
     @ApiResponse({ status: 200, description: 'success - 삭제된 온보딩', type: onboardDto})
     @ApiResponse({status: 404, description: 'failed - 온보딩 없음'})
     @Delete("removeOnboard")
-    @UseGuards(JwtServiceAuthGuard)
-    async deleteOnboard(@Req() req, @Res() res){
-        let onboard = await this.onboardService.findOnboard(req);
+    @UseGuards(JwtStrategy)
+    async deleteOnboard(@Body() body: UserIdDto, @Res() res){
+        let onboard = await this.onboardService.findOnboard(body);
         if (onboard == null) {
             return res.status(HttpStatus.NOT_FOUND).json({});
         }
