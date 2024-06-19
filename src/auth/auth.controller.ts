@@ -143,7 +143,7 @@ export class AuthController {
     @ApiOperation({summary: '구글 토큰 검증', description: 'Google OAuth 토큰을 검증한다.'})
     @ApiBody({ type: UserDto})
     @ApiResponse({ 
-        status: 200, 
+        status: 200,
         description: 'Google token 검증 성공',
         type: UserDto
     })

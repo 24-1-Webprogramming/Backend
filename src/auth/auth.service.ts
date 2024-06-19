@@ -155,8 +155,9 @@ export class AuthService {
             } as CreateUserDto;
             await this.postJoin(input);
           }
-
-
+          else if (user.nickname == null) {
+            isExist = false;
+          }
           return {
             success: true,
             isExist: isExist,
