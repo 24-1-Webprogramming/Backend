@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateExerciseRecordDto {
-  @ApiProperty({ description: '날짜 (문자열)', example: '2024-06-18' })
+export class ExerciseRecordDto {
+  @ApiProperty({ description: '기록 ID' })
+  exercise_id: number;
+
+  @ApiProperty({ description: '날짜 (문자열)', example: '2023-06-18' })
   date: string;
 
   @ApiProperty({ description: '이미지 주소', required: false, example: 'http://example.com/image.png' })
@@ -18,4 +21,7 @@ export class CreateExerciseRecordDto {
 
   @ApiProperty({ description: '칼로리 소모량', example: 300 })
   caloriesBurned: number;
+
+  @ApiProperty({ description: '사용자 ID' })
+  user_id: string;
 }

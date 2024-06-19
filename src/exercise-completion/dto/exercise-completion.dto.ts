@@ -1,7 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateExerciseCompletionDto {
-  @ApiProperty({ description: '운동 날짜', example: '2024-06-18' })
+export class ExerciseCompletionDto {
+  @ApiProperty({ description: '운동 완료 ID' })
+  id: number;
+
+  @ApiProperty({ description: '사용자 ID' })
+  userId: string;
+
+  @ApiProperty({ description: '운동 날짜', example: '2023-06-18' })
   date: string;
 
   @ApiProperty({ description: '운동 시간 (분)', example: 60 })

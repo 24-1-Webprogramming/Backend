@@ -1,21 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ExerciseCompletion } from '../entities/exercise-completion.entity';
+import { CreateExerciseCompletionDto } from './dto/create-exercise-completion.dto';
+import { ExerciseCompletionDto } from './dto/exercise-completion.dto';
 
 @Injectable()
 export class ExerciseCompletionService {
-  constructor(
-    @InjectRepository(ExerciseCompletion)
-    private readonly exerciseCompletionRepository: Repository<ExerciseCompletion>,
-  ) {}
+  private completions: ExerciseCompletionDto[] = [];
+  private idCounter = 1;
 
-  async completeExercise(userId: string, date: string, duration: number, routine: string, notes: string): Promise<ExerciseCompletion> {
-    const newCompletion = this.exerciseCompletionRepository.create({ user: { user_id: userId }, date, duration, routine, notes });
-    return this.exerciseCompletionRepository.save(newCompletion);
+  async completeExercise(userId: string, createExerciseCompletionDto: CreateExerciseCompletionDto): Promise<ExerciseCompletionDto> {
+    const newCompletion: ExerciseCompletionDto = {
+      id: this.idCounter++,
+      userId,
+      ...createExerciseCompletionDto,
+    };
+    this.completions.push(newCompletion);
+    return newCompletion;
   }
 
-  async getCompletionsByUser(userId: string): Promise<ExerciseCompletion[]> {
-    return this.exerciseCompletionRepository.find({ where: { user: { user_id: userId } } });
+  async getCompletionsByUser(userId: string): Promise<ExerciseCompletionDto[]> {
+    return this.completions.filter(completion => completion.userId === userId);
   }
 }
