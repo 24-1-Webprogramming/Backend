@@ -23,17 +23,17 @@ export class GymController {
 
   @Post()
   async createGym(@Body() createGymDto: CreateGymDto) {
-    return this.gymService.createGym(createGymDto);
+    return await this.gymService.createGym(createGymDto);
   }
 
   @Get()
   async getGyms() {
-    return this.gymService.getGyms();
+    return await this.gymService.getGyms();
   }
 
   @Get(':id')
   async getGymById(@Param('id') id: number) {
-    return this.gymService.getGymById(id);
+    return await this.gymService.getGymById(id);
   }
 
   @Get('location')
@@ -41,6 +41,6 @@ export class GymController {
     @Query('latitude') latitude: number,
     @Query('longitude') longitude: number
   ) {
-    return this.gymService.getGymsByLocation(latitude, longitude);
+    return await this.gymService.getGymsByLocation(latitude, longitude);
   }
 }

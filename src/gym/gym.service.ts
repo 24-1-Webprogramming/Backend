@@ -36,19 +36,19 @@ export class GymService {
 
     async createGym(createGymDto: CreateGymDto): Promise<Gym> {
         const newGym = this.gymRepository.create(createGymDto);
-        return this.gymRepository.save(newGym);
+        return await this.gymRepository.save(newGym);
     }
     
     async getGyms(): Promise<Gym[]> {
-        return this.gymRepository.find();
+        return await this.gymRepository.find();
     }
     
     async getGymById(gymId: number): Promise<Gym> {
-        return this.gymRepository.findOne({ where: { gym_id: gymId } });
+        return await this.gymRepository.findOne({ where: { gym_id: gymId } });
     }
     
     async getGymsByLocation(latitude: number, longitude: number): Promise<Gym[]> {
         // You can implement a more sophisticated location-based search here
-        return this.gymRepository.find();
+        return await this.gymRepository.find();
     }
 }
