@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtServiceStrategy } from 'src/auth/strategies/jwt-service.strategy';
 import { Users } from 'src/entities/users.entity';
 import { Stat } from 'src/entities/user_stats.entity';
+import { JwtStrategy } from 'src/auth/strategies/newStrategy.strategy';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { Stat } from 'src/entities/user_stats.entity';
     })
   ],
   controllers: [GroupController],
-  providers: [GroupService, JwtServiceStrategy],
+  providers: [GroupService, JwtServiceStrategy, JwtStrategy],
   exports: [GroupModule]
 })
 export class GroupModule {}
